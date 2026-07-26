@@ -4,4 +4,7 @@ services:
     runtime: python
     rootDir: src
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn src.app:app
+    envVars:
+      - key: PYTHONDONTWRITEBYTECODE
+        value: "1"
