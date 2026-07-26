@@ -1,55 +1,61 @@
-# FileXplorer 📂
+# FileXplorer
 
-FileXplorer is a dynamic tool designed for searching open directories and uncovering Direct Download Links (DDL) for various media, including movies, TV shows, books, and more. It harnesses the power of Google's Dorking and a custom Torrent Indexing Script for comprehensive and efficient results.
+Open directory and torrent search engine. 100% free, no API keys, no accounts.
 
-## Project Overview
-- **Experience the Magic:** [ Explore FileXplorer Live 👨‍💻](https://filexplorer.onrender.com)
-- ⚠️ **Disclaimer:** FileXplorer indexes publicly available files and does not host any copyrighted content. Use responsibly.
+Scrapes search engines directly — DuckDuckGo and Mojeek for web results, 1337x and Torrentz2 for torrents.
 
-## Technologies Used 🛠️
-- **Frontend:**
-  - HTML, CSS, Bootstrap
-  - JavaScript, jQuery
+## Live
 
-- **Backend:**
-  - Flask (Python)
+[filexplorer.onrender.com](https://filexplorer.onrender.com)
 
-## FileXplorer Interface
-![FileXplorer](https://github.com/sidinsearch/FileXplorer-SearchEngine/assets/29821792/3358ebc2-40ad-4525-904f-d4eb1a12d328)
+## How it works
 
+| Search type | Sources (tried in order) |
+|-------------|--------------------------|
+| Web / open dirs | DuckDuckGo HTML → Mojeek |
+| Torrents | 1337x → Torrentz2 → BitSearch |
 
-## Search Results Overview
-- **Regular Search:**
-  - Displays search results with emojis indicating file types (directories, reference pages).
-  - Click on the link to view details, opening in a new tab.
+First source with results wins. If one goes down, next takes over automatically.
 
-- **Torrent Search:**
-  - Presents torrent search results with emojis distinguishing between magnet links and files.
-  - Provides direct links for easy access.
+Google dork syntax (`intitle:"index.of"`) works across all sources.
 
-## Features 🚀
-- **Search Options:**
-  - Search for everything or filter by specific types (Video, Audio, eBook, Software).
-  - Utilizes Google's Dorking for efficient search queries.
+## Stack
 
-- **Dark Mode:**
-  - Toggle between light and dark mode with an emoji-themed switch. 🌙☀️
-  - Customize the look and feel according to your preference.
+- **Backend:** Flask + BeautifulSoup + Requests
+- **Frontend:** HTML, Bootstrap, jQuery
+- **Deploy:** Render (free tier)
 
-- **Emoji Legend:**
-  - Easily understand search results with emojis indicating directories, magnet links, and reference pages. 📁🧲📄
+## Run locally
 
-## Search Mechanisms 🔍
-FileXplorer employs two powerful search mechanisms:
-- **Google Dorking:**
-  - Utilizes Google's advanced search operators for targeted and efficient results.
+```bash
+pip install -r requirements.txt
+cd src
+flask run
+```
 
-- **Torrent Indexing Script:**
-  - Custom script for indexing and retrieving torrents for a comprehensive search experience.
+No `.env` file needed. Zero configuration.
 
-## Contributing 🤝
-Contributions are welcome! If you have ideas for improvements or find any issues, please open an issue or submit a pull request.
+## Deploy to Render
+
+1. Push to GitHub
+2. [render.com](https://render.com) → **New → Web Service** → connect repo
+3. Settings:
+   - Root Directory: `src`
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `gunicorn app:app`
+4. Deploy. No environment variables required.
+
+## Features
+
+- Open directory finder (Google dorking via DDG/Mojeek)
+- Torrent search with seeds/leechers/size
+- Dark mode toggle
+- Emoji legend for result types
+
+## Disclaimer
+
+Indexes publicly available files. Does not host copyrighted content. Use responsibly.
 
 ---
 
-**MADE WITH ❤️ BY SIDINSEARCH**
+Made by SIDINSEARCH

@@ -16,31 +16,18 @@ function search() {
     // Hide the disclaimer after the search button is clicked
     document.getElementById('disclaimerContainer').style.display = 'none';
 
-    var apiKey = 'Replace with your Google Custom Search API key'; // 
-    var cx = 'Replace with your Custom Search Engine ID'; // 
-
-    var searchType = '';
-    if (document.getElementById("o1").checked) {
-        searchType = ''; // Modify or add search types as needed
-    }
-
-    var apiUrl = 'https://www.googleapis.com/customsearch/v1?q=' + encodeURIComponent(searchTerm + ' intitle:"index.of"') + '&key=' + apiKey + '&cx=' + cx;
-
-    // Google search logic
+    // Web search via DuckDuckGo (no API key needed)
     $.ajax({
-        url: apiUrl,
+        url: '/search_web',
+        method: 'POST',
+        data: { searchTerm: searchTerm },
         dataType: 'json',
         success: function(data) {
-            // Handle the data and display it on your page
             displayResults(data);
-
-            // Hide the loading animation after the search is complete
             loadingAnimation.style.display = 'none';
         },
         error: function(error) {
             console.error('Error:', error);
-
-            // Hide the loading animation in case of an error
             loadingAnimation.style.display = 'none';
         }
     });
@@ -70,21 +57,14 @@ function search() {
 function displayResults(data) {
     var resultsContainer = $("#searchResults");
     resultsContainer.empty();
-        // Hide the "MADE WITH ❤️ BY SIDINSEARCH" paragraph
-        document.getElementById("madeWithBy").style.display = "none";
+    document.getElementById("madeWithBy").style.display = "none";
 
-    if (data.items) {
-        for (var i = 0; i < data.items.length; i++) {
-            var title = data.items[i].title;
-            var link = data.items[i].link;
-
-            // Determine if the link is likely a file or directory
+    if (data && data.length > 0) {
+        for (var i = 0; i < data.length; i++) {
+            var title = data[i].title;
+            var link = data[i].link;
             var isDirectory = link.endsWith('/');
-
-            // Emoji for file or directory
             var emoji = isDirectory ? '📁' : '📄';
-
-            // Append result to the container with emoji and link opening in a new tab
             resultsContainer.append('<p>' + emoji + ' <strong style="display: block; word-wrap: break-word;">' + title + '</strong><a href="' + link + '" target="_blank">View Details</a></p>');
         }
     } else {
