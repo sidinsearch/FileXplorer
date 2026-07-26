@@ -1,61 +1,70 @@
-# FileXplorer
+# FileXplorer 📂
 
-Open directory and torrent search engine. 100% free, no API keys, no accounts.
+FileXplorer is a dynamic tool designed for searching open directories and uncovering Direct Download Links (DDL) for various media, including movies, TV shows, books, and more. It harnesses the power of Google's Dorking and a custom Torrent Indexing Script for comprehensive and efficient results.
 
-Scrapes search engines directly — DuckDuckGo and Mojeek for web results, 1337x and Torrentz2 for torrents.
+## Project Overview
+- **Experience the Magic:** [ Explore FileXplorer Live 👨‍💻](https://filexplorer.onrender.com)
+- ⚠️ **Disclaimer:** FileXplorer indexes publicly available files and does not host any copyrighted content. Use responsibly.
 
-## Live
+## Technologies Used 🛠️
+- **Frontend:**
+  - HTML, CSS, Bootstrap
+  - JavaScript, jQuery
 
-[filexplorer.onrender.com](https://filexplorer.onrender.com)
+- **Backend:**
+  - Flask (Python)
+  - BeautifulSoup (HTML scraping)
+  - DuckDuckGo + Mojeek (web search — free, no API)
+  - 1337x + Torrentz2 + BitSearch (torrent search — free, no API)
 
-## How it works
+## FileXplorer Interface
+![FileXplorer](https://github.com/sidinsearch/FileXplorer-SearchEngine/assets/29821792/3358ebc2-40ad-4525-904f-d4eb1a12d328)
 
-| Search type | Sources (tried in order) |
-|-------------|--------------------------|
-| Web / open dirs | DuckDuckGo HTML → Mojeek |
-| Torrents | 1337x → Torrentz2 → BitSearch |
 
-First source with results wins. If one goes down, next takes over automatically.
+## Search Results Overview
+- **Regular Search:**
+  - Displays search results with emojis indicating file types (directories, reference pages).
+  - Click on the link to view details, opening in a new tab.
 
-Google dork syntax (`intitle:"index.of"`) works across all sources.
+- **Torrent Search:**
+  - Presents torrent search results with emojis distinguishing between magnet links and files.
+  - Provides direct links for easy access.
 
-## Stack
+## Features 🚀
+- **Search Options:**
+  - Search for everything or filter by specific types (Video, Audio, eBook, Software).
+  - Uses DuckDuckGo and Mojeek for free web search with Google dork syntax.
+  - Custom torrent indexing across 1337x, Torrentz2, and BitSearch.
 
-- **Backend:** Flask + BeautifulSoup + Requests
-- **Frontend:** HTML, Bootstrap, jQuery
-- **Deploy:** Render (free tier)
+- **Dark Mode:**
+  - Toggle between light and dark mode with an emoji-themed switch. 🌙☀️
+  - Customize the look and feel according to your preference.
 
-## Run locally
+- **Emoji Legend:**
+  - Easily understand search results with emojis indicating directories, magnet links, and reference pages. 📁🧲📄
 
-```bash
-pip install -r requirements.txt
-cd src
-flask run
-```
+## Search Mechanisms 🔍
+FileXplorer employs multiple free search engines with automatic fallback:
+- **Open Directory Search:**
+  - Primary: DuckDuckGo HTML scraping
+  - Fallback: Mojeek (independent index)
 
-No `.env` file needed. Zero configuration.
+- **Torrent Search:**
+  - Primary: 1337x (seeds, leechers, size)
+  - Fallback: Torrentz2 (meta-search)
+  - Last resort: BitSearch (DHT, magnet links)
 
-## Deploy to Render
-
+## Deploy to Render 🌐
 1. Push to GitHub
 2. [render.com](https://render.com) → **New → Web Service** → connect repo
-3. Settings:
-   - Root Directory: `src`
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `gunicorn app:app`
-4. Deploy. No environment variables required.
+3. Root Directory: `src`
+4. Build Command: `pip install -r requirements.txt`
+5. Start Command: `gunicorn app:app`
+6. Deploy — no environment variables needed.
 
-## Features
-
-- Open directory finder (Google dorking via DDG/Mojeek)
-- Torrent search with seeds/leechers/size
-- Dark mode toggle
-- Emoji legend for result types
-
-## Disclaimer
-
-Indexes publicly available files. Does not host copyrighted content. Use responsibly.
+## Contributing 🤝
+Contributions are welcome! If you have ideas for improvements or find any issues, please open an issue or submit a pull request.
 
 ---
 
-Made by SIDINSEARCH
+**MADE WITH ❤️ BY SIDINSEARCH**
