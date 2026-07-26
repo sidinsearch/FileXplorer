@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: filexplorer
+    runtime: python
+    rootDir: src
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
