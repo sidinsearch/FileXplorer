@@ -1,8 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from bs4 import BeautifulSoup
-from urllib.parse import parse_qs, urlparse, unquote
+from urllib.parse import parse_qs, urlparse, unquote, quote
 import requests
-import xml.etree.ElementTree as ET
 
 app = Flask(__name__)
 
@@ -17,41 +16,68 @@ HEADERS = {
 }
 
 
+# ── Helpers ─────────────────────────────────────────────────────────────
+
+def _valid_url(url):
+    return url.startswith('http://') or url.startswith('https://')
+
+
+def _ddg_extract(soup, limit):
+    results = []
+    seen = set()
+    for row in soup.select('.result'):
+        link = row.select_one('a.result__a')
+        snippet_el = row.select_one('.result__snippet')
+        if not link:
+            continue
+        href = link.get('href', '')
+        if 'uddg=' in href:
+            url = unquote(parse_qs(urlparse(href).query).get('uddg', [href])[0])
+        else:
+            url = href
+        if not _valid_url(url) or url in seen:
+            continue
+        seen.add(url)
+        results.append({
+            'title': link.get_text(strip=True),
+            'link': url,
+            'snippet': snippet_el.get_text(strip=True) if snippet_el else '',
+        })
+        if len(results) >= limit:
+            break
+    return results
+
+
 # ── Web search ──────────────────────────────────────────────────────────
 
-def _ddg_html(query, result_limit=15):
-    try:
-        resp = requests.post(
-            'https://html.duckduckgo.com/html/',
-            data={'q': query, 'kl': 'us-en'},
-            headers=HEADERS,
-            timeout=15,
-        )
-        if resp.status_code != 200:
-            return []
-
-        soup = BeautifulSoup(resp.text, 'html.parser')
-        results = []
-        for row in soup.select('.result'):
-            link = row.select_one('a.result__a')
-            snippet_el = row.select_one('.result__snippet')
-            if not link:
+def _ddg(query, result_limit=15):
+    """Try DDG with multiple query strategies, merge results."""
+    queries = [
+        f'inurl:"index of" {query}',
+        query,
+    ]
+    all_results = []
+    seen = set()
+    for q in queries:
+        try:
+            resp = requests.post(
+                'https://html.duckduckgo.com/html/',
+                data={'q': q, 'kl': 'us-en'},
+                headers=HEADERS,
+                timeout=10,
+            )
+            if resp.status_code != 200:
                 continue
-            href = link.get('href', '')
-            if 'uddg=' in href:
-                url = unquote(parse_qs(urlparse(href).query).get('uddg', [href])[0])
-            else:
-                url = href
-            results.append({
-                'title': link.get_text(strip=True),
-                'link': url,
-                'snippet': snippet_el.get_text(strip=True) if snippet_el else '',
-            })
-            if len(results) >= result_limit:
+            soup = BeautifulSoup(resp.text, 'html.parser')
+            for r in _ddg_extract(soup, result_limit):
+                if r['link'] not in seen:
+                    seen.add(r['link'])
+                    all_results.append(r)
+            if len(all_results) >= result_limit:
                 break
-        return results
-    except requests.RequestException:
-        return []
+        except requests.RequestException:
+            continue
+    return all_results[:result_limit]
 
 
 def _mojeek(query, result_limit=15):
@@ -66,15 +92,58 @@ def _mojeek(query, result_limit=15):
             return []
         soup = BeautifulSoup(resp.text, 'html.parser')
         results = []
-        for li in soup.select('ul.results-standard > li'):
-            a = li.select_one('.title a')
-            s = li.select_one('.s')
-            if a:
-                results.append({
-                    'title': a.get_text(strip=True),
-                    'link': a['href'],
-                    'snippet': s.get_text(strip=True) if s else '',
-                })
+        # Try multiple selector patterns (Mojeek changes HTML periodically)
+        selectors = [
+            ('ul.results-standard > li', '.title a', '.s'),
+            ('.web-results li', 'a', '.s'),
+            ('ol li', 'a', None),
+        ]
+        for container_sel, link_sel, snip_sel in selectors:
+            items = soup.select(container_sel)
+            if not items:
+                continue
+            for li in items:
+                a = li.select_one(link_sel)
+                s = li.select_one(snip_sel) if snip_sel else None
+                if a and a.get('href') and _valid_url(a['href']):
+                    results.append({
+                        'title': a.get_text(strip=True),
+                        'link': a['href'],
+                        'snippet': s.get_text(strip=True) if s else '',
+                    })
+                if len(results) >= result_limit:
+                    break
+            if results:
+                break
+        return results
+    except requests.RequestException:
+        return []
+
+
+def _brave(query, result_limit=15):
+    try:
+        resp = requests.get(
+            'https://search.brave.com/search',
+            params={'q': query},
+            headers={'User-Agent': UA},
+            timeout=15,
+        )
+        if resp.status_code != 200:
+            return []
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        results = []
+        for snippet in soup.select('div.snippet'):
+            title_el = snippet.select_one('.snippet-title')
+            url_el = snippet.select_one('.result-header')
+            desc_el = snippet.select_one('.snippet-description')
+            if title_el and url_el:
+                url = url_el.get('href', '')
+                if _valid_url(url):
+                    results.append({
+                        'title': title_el.get_text(strip=True),
+                        'link': url,
+                        'snippet': desc_el.get_text(strip=True) if desc_el else '',
+                    })
             if len(results) >= result_limit:
                 break
         return results
@@ -83,7 +152,7 @@ def _mojeek(query, result_limit=15):
 
 
 def search_web(query, result_limit=15):
-    for engine in (_ddg_html, _mojeek):
+    for engine in (_ddg, _mojeek, _brave):
         results = engine(query, result_limit)
         if results:
             return results
@@ -95,7 +164,7 @@ def search_web(query, result_limit=15):
 def _1337x(query, result_limit=15):
     try:
         resp = requests.get(
-            f'https://1337x.to/search/{query}/1/',
+            f'https://1337x.to/search/{quote(query)}/1/',
             headers={'User-Agent': UA},
             timeout=15,
         )
@@ -163,7 +232,7 @@ def _bitsearch(query, result_limit=15):
 def _torrentz2(query, result_limit=15):
     try:
         resp = requests.get(
-            f'https://torrentz2.nz/search?q={query}',
+            f'https://torrentz2.nz/search?q={quote(query)}',
             headers={'User-Agent': UA},
             timeout=15,
         )
@@ -174,10 +243,14 @@ def _torrentz2(query, result_limit=15):
         for div in soup.find_all('div', class_='results'):
             for a in div.find_all('a', href=True):
                 if a.text:
-                    results.append({
-                        'title': a.text.strip(),
-                        'link': a['href'],
-                    })
+                    href = a['href']
+                    if href.startswith('/'):
+                        href = 'https://torrentz2.nz' + href
+                    if _valid_url(href):
+                        results.append({
+                            'title': a.text.strip(),
+                            'link': href,
+                        })
                 if len(results) >= result_limit:
                     return results
         return results

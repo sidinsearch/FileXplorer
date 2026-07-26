@@ -1,28 +1,95 @@
-/* dark_mode.css */
-
 body {
-    background-color: #1f1f1f;
-    color: #ffffff;
+    background-color: #1a1a2e;
+    color: #e0e0e0;
 }
 
-form {
-    background-color: #1f1f1f;
-    
+.search-box h1, .search-box p {
+    color: #e0e0e0;
+}
+
+.form-control {
+    background-color: #2d2d44;
+    color: #e0e0e0;
+    border-color: #444;
+}
+
+.result-heading {
+    color: #e0e0e0;
+    border-bottom-color: #5b86e5;
+}
+
+.result-card {
+    background: #2d2d44;
+    border-color: #444;
+}
+
+.result-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.result-title a {
+    color: #8ab4f8;
+}
+
+.result-url {
+    color: #81c995;
+}
+
+.result-snippet {
+    color: #b0b0b0;
+}
+
+.torrent-meta span {
+    background: #3a3a50;
+    color: #ccc;
+}
+
+.torrent-seeds {
+    background: #1e3a2a !important;
+    color: #81c995 !important;
+}
+
+.torrent-leech {
+    background: #3a1e1e !important;
+    color: #f28b82 !important;
+}
+
+.torrent-size {
+    background: #1e2a3a !important;
+    color: #8ab4f8 !important;
+}
+
+.no-results {
+    color: #888;
+}
+
+.legend-container {
+    background: rgba(45,45,68,0.9);
+    color: #ccc;
 }
 
 input {
-    background-color: #2d2d2d;
-    color: #ffffff;
-    border-color: #4a4a4a;
+    background-color: #2d2d44;
+    color: #e0e0e0;
 }
 
 button {
-    background-color: #3498db;
+    background-color: #5b86e5;
     color: #ffffff;
 }
 
 button:hover {
-    background-color: #2980b9;
+    background-color: #4a75c4;
 }
 
-/* Add more styles based on your specific design */
+.slider {
+    background-color: #555;
+}
+
+input:checked + .slider {
+    background-color: #5b86e5;
+}
+
+.text-dark {
+    color: #ccc !important;
+}

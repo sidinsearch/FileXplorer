@@ -2,68 +2,42 @@
 <html lang="en">
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Search for open directories. Find DDL for movies, TV, books, etc.">
-    <meta name="author" content="IceWreck">
     <title>FileXplorer</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
 
-
-    <link rel="canonical" href="https://opendirsearch.abifog.com">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
-
-    <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    
-    <!-- Custom CSS -->
     <link href="{{ url_for('static', filename='css/custom_styles.css') }}" rel="stylesheet">
-
-    <!-- Dark mode styles -->
     <link href="{{ url_for('static', filename='css/dark_mode.css') }}" rel="stylesheet" id="darkModeStyles">
 
     <style>
-        /* Custom styles for positioning the toggle button */
         .dark-mode-toggle-container {
             position: fixed;
             top: 10px;
             right: 10px;
             z-index: 1000;
         }
-
-        .sun,
-        .moon {
+        .sun, .moon {
             position: relative;
             z-index: 1001;
         }
-
         .dark-mode-toggle-container .switch {
             position: relative;
             z-index: 1000;
         }
-    </style>
-</head>
-
-<body class="bg-gray-100">
-
-    <!-- Emoji Toggle Button for Dark Mode/Light Mode -->
-    <style>
-        .sun,
-        .moon {
+        .sun, .moon {
             position: absolute;
             top: 49%;
             transform: translateY(-50%);
         }
-
-        .sun {
-            left: 6px;
-        }
-
-        .moon {
-            right: 6px;
-        }
+        .sun { left: 6px; }
+        .moon { right: 6px; }
     </style>
+</head>
+
+<body>
 
     <div class="dark-mode-toggle-container">
         <label class="switch">
@@ -77,14 +51,11 @@
     <script>
         var darkModeStyles = document.getElementById('darkModeStyles');
         var darkModeToggle = document.querySelector('.switch input');
-
-        // Set default mode to light
         darkModeStyles.href = '';
 
         function toggleEmojis() {
             var sun = document.querySelector('.sun');
             var moon = document.querySelector('.moon');
-
             if (darkModeToggle.checked) {
                 sun.style.display = 'none';
                 moon.style.display = 'inline';
@@ -93,107 +64,85 @@
                 moon.style.display = 'none';
             }
         }
-
-        toggleEmojis(); // initial set
+        toggleEmojis();
 
         function toggleDarkMode() {
-            darkModeStyles.href = darkModeToggle.checked ? '{{ url_for('static', filename='css/dark_mode.css') }}' : '';
+            darkModeStyles.href = darkModeToggle.checked ? '{{ url_for("static", filename="css/dark_mode.css") }}' : '';
             toggleEmojis();
         }
     </script>
 
-    <!-- Rest of your existing HTML code -->
-    <form class="form-signin" id="searchForm">
-        <div class="text-center mb-3">
-            <!-- Placeholder logo, replace with actual path -->
-            <img class="mb-4" src="{{ url_for('static', filename='img/logo.png') }}" alt="" width="72" height="72">
-            <h1 class="h3 mb-3 font-weight-normal">FileXplorer</h1>
-            <p>Find Open Directories & Direct Magnet Links with this tool. It uses Google's Dorking & Custom Torrent Indexing Script.</p>
-        </div>
+    <div class="container">
+        <!-- Search Box -->
+        <div class="search-box">
+            <img class="mb-3" src="{{ url_for('static', filename='img/logo.png') }}" alt="FileXplorer" width="64" height="64">
+            <h1 class="h3 mb-2">FileXplorer</h1>
+            <p class="text-muted mb-3">Find Open Directories &amp; Direct Magnet Links. Uses DuckDuckGo dorking &amp; torrent indexing.</p>
 
-        <div class="form-label-group">
-            <input type="text" id="searchTerm" class="form-control" placeholder="Search Term" required autofocus>
-            <label for="inputTerm">Search Keyword</label>
-        </div>
+            <div class="input-group mb-3">
+                <input type="text" id="searchTerm" class="form-control" placeholder="Search term..." autofocus
+                       onkeydown="if(event.key==='Enter'){event.preventDefault();search();}">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" onclick="search()">EXPLORE</button>
+                </div>
+            </div>
 
-        <center>
-            <label class="radio-inline">
-                <input id="o1" type="radio" name="optradio" checked> Everything 🌐
-            </label>
-            <!-- ... (other radio buttons) -->
-            <br>
-            <label class="radio-inline">
-                <input id="o2" type="radio" name="optradio"> Video 🎥
-            </label>
-            <label class="radio-inline">
-                <input id="o3" type="radio" name="optradio"> Audio 🎵
-            </label>
-            <label class="radio-inline">
-                <input id="o4" type="radio" name="optradio"> eBook 📚
-            </label>
-            <label class="radio-inline">
-                <input id="o5" type="radio" name="optradio"> Software 💻
-            </label>
-        </center>
-
-        <div class="search-container">
-            <button class="btn btn-lg btn-primary btn-block" type="button" onclick="search()">EXPLORE FILES</button>
-    
-            <!-- Loading animation -->
-            <div id="loadingAnimation" class="loading-container">
-                <div class="loading"></div>
+            <div class="text-center mb-2">
+                <label class="radio-inline mr-3">
+                    <input id="o1" type="radio" name="optradio" checked> Everything 🌐
+                </label>
+                <label class="radio-inline mr-3">
+                    <input id="o2" type="radio" name="optradio"> Video 🎥
+                </label>
+                <label class="radio-inline mr-3">
+                    <input id="o3" type="radio" name="optradio"> Audio 🎵
+                </label>
+                <label class="radio-inline mr-3">
+                    <input id="o4" type="radio" name="optradio"> eBook 📚
+                </label>
+                <label class="radio-inline">
+                    <input id="o5" type="radio" name="optradio"> Software 💻
+                </label>
             </div>
         </div>
-        <p id="madeWithBy" class="mt-5 mb-3 text-muted text-center">MADE WITH ❤️ BY SIDINSEARCH </p>
 
-        <br>
+        <!-- Loading -->
+        <div id="loadingAnimation" class="text-center my-4" style="display:none;">
+            <div class="loading"></div>
+        </div>
 
+        <!-- Results: two columns -->
+        <div class="row results-row">
+            <div class="col-md-6">
+                <div id="searchResults"></div>
+            </div>
+            <div class="col-md-6">
+                <div id="torrentResults"></div>
+            </div>
+        </div>
 
-<!-- Container for search results -->
-       <div class="row">
+        <p id="madeWithBy" class="mt-4 mb-3 text-muted text-center">MADE WITH ❤️ BY SIDINSEARCH</p>
 
-       <div class="col-md-6 custom-column">
-       <div id="searchResults"></div>
-       </div>
-  
-       <div class="col-md-6 custom-column">  
-      <div id="torrentResults"></div>
-      
-      </div>
-  
-      </div>
-      <!-- Loading animation -->
-<div id="loadingAnimation" class="loading-container">
-    <div class="loading"></div>
-</div>
-
-    </form>
-    <!-- Legend for Emojis -->
-<div class="legend-container">
-    <div class="legend-item">
-        <span class="legend-emoji">📁</span> - Directory
+        <!-- Legend -->
+        <div class="legend-container">
+            <div class="legend-item"><span class="legend-emoji">📁</span> Directory</div>
+            <div class="legend-item"><span class="legend-emoji">🧲</span> Magnet Link</div>
+            <div class="legend-item"><span class="legend-emoji">📄</span> Reference Page</div>
+        </div>
     </div>
-    <div class="legend-item">
-        <span class="legend-emoji">🧲</span> - Magnet Link
-    </div>
-    <div class="legend-item">
-        <span class="legend-emoji">📄</span> - Reference Page
-    </div>
-    <!-- Add more legend items as needed -->
-</div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="{{ url_for('static', filename='js/search.js') }}"></script>
     <!-- Disclaimer -->
     <div class="fixed-bottom p-3 text-center" id="disclaimerContainer">
         <p class="text-dark m-0">
             <span id="disclaimerText" class="bg-transparent text-dark px-2 py-1 rounded disclaimer-font">
-                ⚠️ Disclaimer: FileXplorer Indexes Publicly Available Files And Does Not Host Any Copyrighted Content. Use Responsibly.  
+                ⚠️ Disclaimer: FileXplorer Indexes Publicly Available Files And Does Not Host Any Copyrighted Content. Use Responsibly.
             </span>
         </p>
     </div>
-      
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="{{ url_for('static', filename='js/search.js') }}"></script>
 </body>
 
 </html>

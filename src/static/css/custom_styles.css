@@ -4,98 +4,156 @@ html, body {
 }
 
 body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     background-color: #f5f5f5;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-.form-signin {
-    width: 40%; /* Set width to 40% */
-    max-width: none;
-    padding: 15px;
-    box-sizing: border-box;
-    margin: auto;
+.container {
+    max-width: 1100px;
+    padding-top: 40px;
+    padding-bottom: 80px;
 }
 
-.form-label-group {
-    position: relative;
-    margin-bottom: 1rem;
+/* Search box */
+.search-box {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 30px;
 }
 
-.form-label-group > input,
-.form-label-group > label {
-    height: 3.125rem;
-    padding: .75rem;
+.search-box .input-group {
+    max-width: 500px;
+    margin: 0 auto;
 }
 
-.form-label-group > label {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: block;
-    width: 100%;
-    margin-bottom: 0;
-    line-height: 1.5;
-    color: #495057;
-    pointer-events: none;
-    cursor: text;
-    border: 1px solid transparent;
-    border-radius: .25rem;
-    transition: all .1s ease-in-out;
-    transform-origin: 0 0;
+.search-box .form-control {
+    border-radius: 8px 0 0 8px;
+    height: 48px;
+    font-size: 16px;
 }
 
-.form-label-group input::-webkit-input-placeholder {
-    color: transparent;
-    text-align: center; /* Center align the placeholder text */
+.search-box .btn-primary {
+    border-radius: 0 8px 8px 0;
+    padding: 0 24px;
+    font-weight: 600;
+    background-color: #4285f4;
+    border-color: #4285f4;
 }
 
-.form-label-group input:-ms-input-placeholder {
-    color: transparent;
-    text-align: center; /* Center align the placeholder text */
+.search-box .btn-primary:hover {
+    background-color: #3367d6;
 }
 
-.form-label-group input::-ms-input-placeholder {
-    color: transparent;
-    text-align: center; /* Center align the placeholder text */
+/* Result headings */
+.result-heading {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #4285f4;
 }
 
-.form-label-group input::-moz-placeholder {
-    color: transparent;
-    text-align: center; /* Center align the placeholder text */
+/* Result cards */
+.result-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    transition: box-shadow 0.2s;
 }
 
-.form-label-group input::placeholder {
-    color: transparent;
-    text-align: center; /* Center align the placeholder text */
+.result-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.form-label-group input:not(:placeholder-shown) {
-    padding-top: 1.25rem;
-    padding-bottom: .25rem;
+.result-title {
+    font-size: 15px;
+    margin-bottom: 4px;
+    word-wrap: break-word;
 }
 
-.form-label-group input:not(:placeholder-shown) ~ label {
-    padding-top: .25rem;
-    padding-bottom: .25rem;
+.result-title a {
+    color: #1a0dab;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.result-title a:hover {
+    text-decoration: underline;
+}
+
+.result-url {
     font-size: 12px;
-    color: #777;
+    color: #006621;
+    word-break: break-all;
+    margin-bottom: 4px;
 }
 
-/* Dark mode styles */
-#darkModeStyles {
-    /* Add your dark mode styles here */
+.result-snippet {
+    font-size: 13px;
+    color: #545454;
+    line-height: 1.4;
 }
 
-/* Toggle button styles */
-.toggle-container {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    z-index: 1000;
+/* Torrent meta */
+.torrent-meta {
+    margin-top: 6px;
+    font-size: 12px;
 }
 
+.torrent-meta span {
+    display: inline-block;
+    margin-right: 14px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #f0f0f0;
+    color: #333;
+}
+
+.torrent-seeds {
+    background: #e6f4ea !important;
+    color: #1e7e34 !important;
+    font-weight: 600;
+}
+
+.torrent-leech {
+    background: #fce8e6 !important;
+    color: #c62828 !important;
+    font-weight: 600;
+}
+
+.torrent-size {
+    background: #e8f0fe !important;
+    color: #1967d2 !important;
+}
+
+/* No results */
+.no-results {
+    text-align: center;
+    color: #888;
+    padding: 30px 0;
+    font-size: 15px;
+}
+
+/* Loading spinner */
+.loading {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #4285f4;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Toggle switch */
 .switch {
     position: relative;
     display: inline-block;
@@ -113,12 +171,8 @@ body {
 .slider {
     position: absolute;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background-color: #ccc;
-    -webkit-transition: .4s;
     transition: .4s;
     border-radius: 34px;
 }
@@ -131,7 +185,6 @@ body {
     left: 4px;
     bottom: 4px;
     background-color: white;
-    -webkit-transition: .4s;
     transition: .4s;
     border-radius: 50%;
 }
@@ -140,114 +193,50 @@ input:checked + .slider {
     background-color: #2196F3;
 }
 
-input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
-}
-
 input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
     transform: translateX(26px);
 }
 
-/* Customize the appearance of the toggle text */
-.toggle-text {
-    font-size: 14px;
-    margin-right: 5px;
-    color: #333;
-}
-
-/* Adjusted styles for the search button */
-.btn {
-    width: 100%; /* Set width to 100% */
-    margin-top: 1rem; /* Add margin-top for spacing */
-}
-#searchResults {
-    margin-bottom: 60px; /* Adjust the margin as needed */
-}
-/* Styles for Legend */
+/* Legend */
 .legend-container {
     position: fixed;
     bottom: 10px;
     left: 10px;
-    background-color: rgba(255, 255, 255, 0.174);
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background: rgba(255,255,255,0.9);
+    padding: 10px 14px;
+    border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+    font-size: 13px;
 }
 
 .legend-item {
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
 .legend-emoji {
-    margin-right: 5px;
+    margin-right: 4px;
 }
-/* Add this rule to your CSS file (custom_styles.css or dark_mode.css) */
+
+.disclaimer-font {
+    font-size: 13px;
+}
+
 .text-white {
     color: white !important;
 }
-/* Add this rule to decrease the font size */
-.disclaimer-font {
-    font-size: 14px; /* Adjust the size as needed */
-}
-/* Container styles */
-.search-container {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 1rem; /* Adjust the margin as needed */
-}
 
-/* Adjusted styles for the search button */
-.btn {
-    width: 100%; /* Set width to 100% */
-    margin-top: 0rem; /* Reduce the margin-top for spacing */
-}
-
-/* Loading animation styles */
-.loading-container {
-    display: none;
-    margin-top: 1.5rem; /* Adjust the margin-top for the loading container */
-}
-
-.loading {
-    border: 8px solid #f3f3f3;
-    border-top: 8px solid #3498db;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-@media (max-width: 600px) {
-  .form-signin {
-    width: 100%;
-    padding: 15px; 
-  }
-}
+/* Responsive */
 @media (max-width: 768px) {
-
-    .legend-container {
-      display: none; 
+    .container {
+        padding-top: 20px;
     }
-  
-  }
-  
-  @media (min-width: 769px) {
-  
-    .legend-container {
-      display: block;
+    .search-box {
+        max-width: 100%;
     }
-  
-  }
-  
-  #disclaimerContainer {
-    display: block; 
-  }
-  
+    .legend-container {
+        display: none;
+    }
+    .result-heading {
+        font-size: 16px;
+    }
+}
