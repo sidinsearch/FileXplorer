@@ -44,14 +44,21 @@ body {
     background-color: #3367d6;
 }
 
+/* Result section */
+.result-section {
+    margin-bottom: 20px;
+}
+
 /* Result headings */
 .result-heading {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
-    color: #333;
+    color: #555;
     margin-bottom: 12px;
-    padding-bottom: 8px;
+    padding-bottom: 6px;
     border-bottom: 2px solid #4285f4;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* Result cards */
@@ -237,6 +244,14 @@ input:checked + .slider:before {
         display: none;
     }
     .result-heading {
-        font-size: 16px;
+        font-size: 14px;
+    }
+    .result-card {
+        padding: 10px 12px;
+    }
+    .torrent-meta span {
+        font-size: 11px;
+        padding: 1px 6px;
+        margin-right: 8px;
     }
 }

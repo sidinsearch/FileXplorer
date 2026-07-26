@@ -5,130 +5,131 @@ function search() {
         return;
     }
 
-    var loadingAnimation = document.getElementById('loadingAnimation');
-    loadingAnimation.style.display = 'block';
+    var loading = document.getElementById('loadingAnimation');
+    loading.style.display = 'block';
     document.getElementById('disclaimerContainer').style.display = 'none';
+    document.getElementById('madeWithBy').style.display = 'none';
 
-    // Web search
+    // Clear previous results
+    $("#searchResults").html('');
+    $("#torrentResults").html('');
+
     $.ajax({
         url: '/search_web',
         method: 'POST',
         data: { searchTerm: searchTerm },
         dataType: 'json',
         success: function(data) {
-            displayResults(data);
-            loadingAnimation.style.display = 'none';
+            renderWebResults(data);
+            loading.style.display = 'none';
         },
-        error: function(error) {
-            console.error('Error:', error);
-            loadingAnimation.style.display = 'none';
+        error: function() {
+            $("#searchResults").html('<div class="result-card"><p class="no-results">Search failed. Try again.</p></div>');
+            loading.style.display = 'none';
         }
     });
 
-    // Torrent search
     $.ajax({
         url: '/torrent_search',
         method: 'POST',
         data: { searchTerm: searchTerm },
-        success: function(torrentData) {
-            displayTorrentResults(torrentData);
-            loadingAnimation.style.display = 'none';
+        dataType: 'json',
+        success: function(data) {
+            renderTorrentResults(data);
+            loading.style.display = 'none';
         },
-        error: function(error) {
-            console.error('Error:', error);
-            loadingAnimation.style.display = 'none';
+        error: function() {
+            $("#torrentResults").html('<div class="result-card"><p class="no-results">Torrent search failed.</p></div>');
+            loading.style.display = 'none';
         }
     });
 }
 
-function escapeHtml(str) {
-    var div = document.createElement('div');
-    div.appendChild(document.createTextNode(str));
-    return div.innerHTML;
+function esc(s) {
+    var d = document.createElement('div');
+    d.appendChild(document.createTextNode(s || ''));
+    return d.innerHTML;
 }
 
-function displayResults(data) {
-    var container = $("#searchResults");
-    container.empty();
-    document.getElementById("madeWithBy").style.display = "none";
+function cleanUrl(url) {
+    try {
+        var u = new URL(url);
+        return u.hostname + u.pathname;
+    } catch(e) {
+        return url;
+    }
+}
 
+function renderWebResults(data) {
+    var el = $("#searchResults");
     if (!data || data.length === 0) {
-        container.html('<p class="no-results">No results found.</p>');
+        el.html('<div class="result-section"><h3 class="result-heading">Web Results</h3><div class="result-card"><p class="no-results">No results found.</p></div></div>');
         return;
     }
-
-    var html = '<h3 class="result-heading">Web Results</h3>';
+    var h = '<div class="result-section"><h3 class="result-heading">Web Results</h3>';
     for (var i = 0; i < data.length; i++) {
-        var title = escapeHtml(data[i].title);
-        var link = escapeHtml(data[i].link);
-        var snippet = data[i].snippet ? escapeHtml(data[i].snippet) : '';
-        var isDir = data[i].link.endsWith('/');
-        var emoji = isDir ? '📁' : '📄';
-        html += '<div class="result-card">' +
-            '<div class="result-title">' + emoji + ' <a href="' + link + '" target="_blank" rel="noopener">' + title + '</a></div>' +
-            '<div class="result-url">' + link + '</div>' +
-            (snippet ? '<div class="result-snippet">' + snippet + '</div>' : '') +
+        var t = esc(data[i].title);
+        var l = esc(data[i].link);
+        var s = data[i].snippet ? esc(data[i].snippet) : '';
+        var d = data[i].link.endsWith('/');
+        var em = d ? '📁' : '📄';
+        var host = '';
+        try { host = new URL(data[i].link).hostname; } catch(e) {}
+        h += '<div class="result-card">' +
+            '<div class="result-title">' + em + ' <a href="' + l + '" target="_blank" rel="noopener">' + t + '</a></div>' +
+            (host ? '<div class="result-url">' + esc(host) + '</div>' : '') +
+            (s ? '<div class="result-snippet">' + s + '</div>' : '') +
             '</div>';
     }
-    container.html(html);
+    h += '</div>';
+    el.html(h);
 }
 
-function displayTorrentResults(data) {
-    var container = $("#torrentResults");
-    container.empty();
-    document.getElementById("madeWithBy").style.display = "none";
-
+function renderTorrentResults(data) {
+    var el = $("#torrentResults");
     if (!data || data.length === 0) {
-        container.html('<p class="no-results">No torrent results found.</p>');
+        el.html('<div class="result-section"><h3 class="result-heading">Torrent Results</h3><div class="result-card"><p class="no-results">No torrent results found.</p></div></div>');
         return;
     }
-
-    var html = '<h3 class="result-heading">Torrent Results</h3>';
+    var h = '<div class="result-section"><h3 class="result-heading">Torrent Results</h3>';
     for (var i = 0; i < data.length; i++) {
-        var title = escapeHtml(data[i].title);
-        var link = escapeHtml(data[i].link);
+        var t = esc(data[i].title);
+        var l = esc(data[i].link);
         var seeds = data[i].seeders || '0';
         var leech = data[i].leechers || '0';
         var size = data[i].size || '';
-        var hasMagnet = data[i].magnet;
-        var isDir = link.endsWith('/');
-        var emoji = hasMagnet ? '🧲' : (isDir ? '📁' : '📄');
+        var magnet = data[i].magnet;
+        var em = magnet ? '🧲' : '📄';
+        var host = '';
+        try { host = new URL(data[i].link).hostname; } catch(e) {}
 
-        html += '<div class="result-card torrent-card">' +
-            '<div class="result-title">' + emoji + ' <a href="' + link + '" target="_blank" rel="noopener">' + title + '</a></div>' +
-            '<div class="torrent-meta">';
-        if (size) html += '<span class="torrent-size">Size: ' + escapeHtml(size) + '</span>';
-        if (seeds !== '0' || leech !== '0') {
-            html += '<span class="torrent-seeds">Seeders: ' + escapeHtml(seeds) + '</span>' +
-                    '<span class="torrent-leech">Leechers: ' + escapeHtml(leech) + '</span>';
-        }
-        html += '</div></div>';
+        h += '<div class="result-card torrent-card">' +
+            '<div class="result-title">' + em + ' <a href="' + l + '" target="_blank" rel="noopener">' + t + '</a></div>';
+        if (host) h += '<div class="result-url">' + esc(host) + '</div>';
+        h += '<div class="torrent-meta">';
+        if (size) h += '<span class="torrent-size">' + esc(size) + '</span>';
+        if (seeds !== '0') h += '<span class="torrent-seeds">▲ ' + esc(seeds) + '</span>';
+        if (leech !== '0') h += '<span class="torrent-leech">▼ ' + esc(leech) + '</span>';
+        h += '</div></div>';
     }
-    container.html(html);
+    h += '</div>';
+    el.html(h);
 }
 
 function toggleDarkMode() {
-    var darkModeStyles = document.getElementById('darkModeStyles');
-    var isDarkMode = darkModeStyles.href.includes('dark_mode.css');
-    darkModeStyles.href = isDarkMode ? 'static/css/custom_styles.css' : 'static/css/dark_mode.css';
+    var el = document.getElementById('darkModeStyles');
+    var isDark = el.href.includes('dark_mode.css');
+    el.href = isDark ? 'static/css/custom_styles.css' : 'static/css/dark_mode.css';
     toggleEmojis();
-    var disclaimerText = document.getElementById('disclaimerText');
-    if (isDarkMode) {
-        disclaimerText.classList.remove('text-white');
-    } else {
-        disclaimerText.classList.add('text-white');
-    }
+    var dt = document.getElementById('disclaimerText');
+    if (isDark) { dt.classList.remove('text-white'); }
+    else { dt.classList.add('text-white'); }
 }
 
 function toggleEmojis() {
     var sun = document.querySelector('.sun');
     var moon = document.querySelector('.moon');
-    var darkModeToggle = document.querySelector('.switch input');
-    if (darkModeToggle.checked) {
-        sun.style.display = 'none';
-        moon.style.display = 'inline';
-    } else {
-        sun.style.display = 'inline';
-        moon.style.display = 'none';
-    }
+    var on = document.querySelector('.switch input').checked;
+    sun.style.display = on ? 'none' : 'inline';
+    moon.style.display = on ? 'inline' : 'none';
 }
